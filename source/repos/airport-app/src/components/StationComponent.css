@@ -1,0 +1,51 @@
+.station-container {
+  position: absolute;
+  width: 175px;
+  height: 175px;
+}
+
+.station {
+  width: 150%;
+  height: 150%;
+  object-fit: cover;
+}
+
+.station-id {
+  position: absolute;
+  top: 64%;
+  left: 119%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  font-weight: bold;
+  color: #c66161;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plane-id {
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  font-size: 6px;
+  color: #62b5dc;
+  background-color: #fdf5f2;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plane-container {
+  position: absolute;
+  top: 98%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+}
+
+.plane {
+  width: 180%;
+  height: 180%;
+  object-fit: cover;
+}

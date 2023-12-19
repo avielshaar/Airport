@@ -1,69 +1,31 @@
-﻿using Airport.Models.DTOs;
-using Airport.Models.Logics;
-using System.Diagnostics.Eventing.Reader;
+﻿using Airport.Logic;
+using Airport.Models.DTOs;
+using Airport.Models.Domains;
 
 namespace Airport.Services
 {
     public class LogicService : ILogicService
     {
-        private readonly Status _status;
+        private readonly Manager _manager;
 
-        public LogicService(Status status)
+        public LogicService(Manager manager)
         {
-            _status = status;
+            _manager = manager;
         }
 
-        public ICollection<PlaneDTO> GetPlaneDTOs()
+        public async Task<ICollection<PlaneDTO>> GetPlaneDTOs()
         {
-            var planes = new List<PlaneDTO>();
-            foreach (var station in _status.Stations)
-            {
-                if (station.Plane != null)
-                {
-                    planes.Add(new PlaneDTO()
-                    {
-                        Id = station.Plane.Id,
-                        Type = station.Plane.Type,
-                        StationId = station.Id
-                    });
-                }
-            }
-            return planes;
+            return await _manager.GetPlanes();
         }
 
-        public void AddPlane(bool type)
+        public async Task AddPlane(bool type)
         {
-            var plane = new Plane(_status.Planes.Max(p => p.Id) + 1, type);
-            if (plane.Type == false && !GetStation(1).IsOccupied)
-            {
-                GetStation(1).Plane = plane;
-            }
-            else if (plane.Type == true)
-            {
-                if (!GetStation(6).IsOccupied)
-                {
-                    GetStation(6).Plane = plane;
-                }
-                else if (!GetStation(7).IsOccupied)
-                {
-                    GetStation(7).Plane = plane;
-                }
-            }
+            await _manager.AddPlane(type);
         }
 
-        public void Start()
+        public async Task Run()
         {
-            _status.Start();
-        }
-
-        public void Stop()
-        {
-            _status.Stop();
-        }
-
-        public Station GetStation(int id)
-        {
-            return _status.Stations.FirstOrDefault(s => s.Id == id);
+            await _manager.MovePlanes();
         }
     }
 }

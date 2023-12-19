@@ -134,3 +134,4 @@ C:\Users\Aviel Shaar\source\repos\Airport\Airport\obj\Debug\net8.0\refint\Airpor
 C:\Users\Aviel Shaar\source\repos\Airport\Airport\obj\Debug\net8.0\Airport.pdb
 C:\Users\Aviel Shaar\source\repos\Airport\Airport\obj\Debug\net8.0\Airport.genruntimeconfig.cache
 C:\Users\Aviel Shaar\source\repos\Airport\Airport\obj\Debug\net8.0\ref\Airport.dll
+C:\Users\Aviel Shaar\source\repos\Airport\Airport\obj\Debug\net8.0\Airport.sourcelink.json

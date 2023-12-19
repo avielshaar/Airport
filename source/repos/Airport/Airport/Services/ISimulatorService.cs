@@ -2,7 +2,6 @@
 {
     public interface ISimulatorService
     {
-        public void Start();
-        public void Stop();
+        public Task Run();
     }
 }

@@ -1,12 +1,6 @@
 ﻿using Airport.Models.Entities;
 using Airport.Data.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
-using Airport.Models.Logics;
+using Airport.Models.Domains;
 
 namespace Airport.Services
 {
@@ -19,29 +13,16 @@ namespace Airport.Services
             _repository = repository;
         }
 
-        public ICollection<Plane> GetPlanes()
+        public async Task<Plane> GetPlane(int id)
         {
-            var planes = new List<Plane>();
-            foreach (Station station in GetStations())
-            {
-                if (station.Plane != null)
-                {
-                    planes.Add(station.Plane);
-                }
-            }
-            return planes;
-        }
-
-        public Plane GetPlane(int id)
-        {
-            foreach (ArrivelEntity arrivel in _repository.GetArrivels().Result)
+            foreach (ArrivelEntity arrivel in await _repository.GetArrivels())
             {
                 if (arrivel.PlaneId == id)
                 {
                     return new Plane(id, false);
                 }
             }
-            foreach (DepartureEntity departure in _repository.GetDepartures().Result)
+            foreach (DepartureEntity departure in await _repository.GetDepartures())
             {
                 if (departure.PlaneId == id)
                 {
@@ -51,14 +32,16 @@ namespace Airport.Services
             return null;
         }
 
-        public ICollection<Station> GetStations()
+        public async Task<ICollection<Station>> GetStations()
         {
+            var stationsEntities = await _repository.GetStations();
             var stations = new List<Station>();
-            foreach (var station in _repository.GetStations().Result)
+            stations.Add(null);
+            foreach (var station in stationsEntities.OrderBy(s => s.Id))
             {
                 if (station.PlaneId != null)
                 {
-                    stations.Add(new Station(station.Id, GetPlane((int)station.PlaneId)));
+                    stations.Add(new Station(station.Id, await GetPlane((int)station.PlaneId)));
                 }
                 else
                 {
@@ -68,53 +51,50 @@ namespace Airport.Services
             return stations;
         }
 
-        public Station GetStation(int id)
+        public async Task UpdateStations(ICollection<Station> stations)
         {
-            return GetStations().FirstOrDefault(s => s.Id == id);
+            foreach (var station in stations.Skip(1))
+            {
+                if (station.IsOccupied)
+                {
+                    await _repository.UpdateStation(new StationEntity() { Id = station.Id, PlaneId = station.Plane.Id });
+                }
+                else
+                {
+                    await _repository.UpdateStation(new StationEntity() { Id = station.Id });
+                }
+            }
         }
 
-        public void UpdateStation(Station station)
-        {
-            _repository.UpdateStation(new StationEntity() { Id = station.Id, PlaneId = station.Id });
-        }
-
-        public void AddHistory(int planeId, int stationId)
+        public async Task AddHistory(int planeId, int stationId)
         {
             var history = new HistoryEntity()
             {
-                Id = _repository.GetHistory().Result.Max(h => h.Id) + 1,
                 PlaneId = planeId,
                 StationId = stationId,
                 In = DateTime.Now
             };
-            _repository.AddHistory(history);
+            await _repository.AddHistory(history);
         }
 
-        public void UpdateHistory(int planeId)
+        public async Task UpdateHistory(int planeId)
         {
-            var history = _repository.GetHistory().Result.OrderByDescending(h => h.Id).FirstOrDefault(h => h.PlaneId == planeId);
+            var histories = await _repository.GetHistory();
+            var history = histories.OrderByDescending(h => h.Id).FirstOrDefault(h => h.PlaneId == planeId);
             history.Out = DateTime.Now;
-            _repository.UpdateHistory(history);
+            await _repository.UpdateHistory(history);
         }
 
-        public void AddDeparture(int planeId)
+        public async Task AddPlane(int planeId, bool type)
         {
-            var departure = new DepartureEntity()
+            if (type == false)
             {
-                Id = _repository.GetDepartures().Result.Max(d => d.Id) + 1,
-                PlaneId = planeId
-            };
-            _repository.AddDeparture(departure);
-        }
-
-        public void AddArrivel(int planeId)
-        {
-            var arrivel = new ArrivelEntity()
+                await _repository.AddArrivel(new ArrivelEntity() { PlaneId = planeId });
+            }
+            else
             {
-                Id = _repository.GetArrivels().Result.Max(a => a.Id) + 1,
-                PlaneId = planeId
-            };
-            _repository.AddArrivel(arrivel);
+                await _repository.AddDeparture(new DepartureEntity() { PlaneId = planeId });
+            }
         }
     }
 }

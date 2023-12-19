@@ -1,4 +1,4 @@
-﻿using Airport.Models.Logics;
+﻿using Airport.Logic;
 
 namespace Airport.Services
 {
@@ -11,14 +11,9 @@ namespace Airport.Services
             _simulator = simulator;
         }
 
-        public void Start()
+        public async Task Run()
         {
-            _simulator.Start();
-        }
-
-        public void Stop()
-        {
-            _simulator.Stop();
+            await _simulator.AddPlanes();
         }
     }
 }

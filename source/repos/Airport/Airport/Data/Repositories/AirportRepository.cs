@@ -1,11 +1,5 @@
 ﻿using Airport.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Airport.Data.Repositories
 {
@@ -30,10 +24,17 @@ namespace Airport.Data.Repositories
             return station;
         }
 
-        public async void UpdateStation(StationEntity station)
+        public async Task UpdateStation(StationEntity station)
         {
-            var oldStation = GetStation(station.Id).Result;
-            oldStation = station;
+            var oldStation = await GetStation(station.Id);
+            if (station.PlaneId != null)
+            {
+                oldStation.PlaneId = station.PlaneId;
+            }
+            else
+            {
+                oldStation.PlaneId = null;
+            }
             await _context.SaveChangesAsync();
         }
 
@@ -49,20 +50,20 @@ namespace Airport.Data.Repositories
             return history;
         }
 
-        public async void AddHistory(HistoryEntity history)
+        public async Task AddHistory(HistoryEntity history)
         {
             _context.History.Add(history);
             await _context.SaveChangesAsync();
         }
 
-        public async void UpdateHistory(HistoryEntity history)
+        public async Task UpdateHistory(HistoryEntity history)
         {
-            var oldHistory = GetHistory(history.PlaneId).Result;
-            oldHistory = history;
+            var oldHistory = await GetHistory(history.Id);
+            oldHistory.Out = history.Out;
             await _context.SaveChangesAsync();
         }
 
-        public async void AddDeparture(DepartureEntity departure)
+        public async Task AddDeparture(DepartureEntity departure)
         {
             _context.Departures.Add(departure);
             await _context.SaveChangesAsync();
@@ -74,13 +75,7 @@ namespace Airport.Data.Repositories
             return departures;
         }
 
-        public async Task<DepartureEntity> GetDeparture(int planeId)
-        {
-            var departure = await _context.Departures.FirstOrDefaultAsync(d => d.PlaneId == planeId);
-            return departure;
-        }
-
-        public async void AddArrivel(ArrivelEntity arrivel)
+        public async Task AddArrivel(ArrivelEntity arrivel)
         {
             _context.Arrivels.Add(arrivel);
             await _context.SaveChangesAsync();
@@ -90,12 +85,6 @@ namespace Airport.Data.Repositories
         {
             var arrivels = await _context.Arrivels.ToListAsync();
             return arrivels;
-        }
-
-        public async Task<ArrivelEntity> GetArrivel(int planeId)
-        {
-            var arrivel = await _context.Arrivels.FirstOrDefaultAsync(a => a.PlaneId == planeId);
-            return arrivel;
         }
     }
 }

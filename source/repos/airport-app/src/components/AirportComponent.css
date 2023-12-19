@@ -1,0 +1,32 @@
+.airport-container {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.simulation-button {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.simulation-button:hover {
+  background-color: #2980b9;
+}
+
+.table-component-container {
+  position: absolute;
+  top: 320px;
+  right: 120px;
+}

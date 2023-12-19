@@ -1,5 +1,4 @@
 ﻿using Airport.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airport.Controllers
@@ -17,25 +16,17 @@ namespace Airport.Controllers
             _simulatorService = simulatorService;
         }
 
-        [HttpGet]
-        public IActionResult Get()
+        [HttpGet("Get")]
+        public async Task<IActionResult> Get()
         {
-            return Ok(_logicService.GetPlaneDTOs());
+            return Ok(await _logicService.GetPlaneDTOs());
         }
 
-        [HttpPost]
-        public IActionResult Start()
+        [HttpPost("Run")]
+        public async Task<IActionResult> Run()
         {
-            _logicService.Start();
-            _simulatorService.Start();
-            return Ok();
-        }
-
-        [HttpPost]
-        public IActionResult Stop()
-        {
-            _logicService.Stop();
-            _simulatorService.Stop();
+            await _logicService.Run();
+            await _simulatorService.Run();
             return Ok();
         }
     }
